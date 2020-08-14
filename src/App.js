@@ -14,11 +14,7 @@ const App = () => {
     const [user, setUser] = useState(null)
     const [error, setError] = useState(null)
 
-  // useEffect(() => {
-  //   blogService.getAll().then(blogs =>
-  //     setBlogs( blogs )
-  //   )
-  // }, [])
+
     useEffect(() => {
         const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
         if (loggedUserJSON) {
@@ -63,7 +59,7 @@ const handleFormSubmit = async event =>{
           ?
           <Login error= {error} username={username} password={password} setUsername={setUsername} setPassword={setPassword} handleLogin={handleFormSubmit}/>
           :
-          <Blogs user={user} blogs={blogs} />
+          <Blogs user={user} blogs={blogs} updateBlogs={setBlogs} />
       }
       </>
 

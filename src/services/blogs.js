@@ -1,6 +1,6 @@
 import axios from 'axios'
-const baseUrl = '/api/blogs'
-// const baseUrl = 'http://localhost:3001/blogs'
+// const baseUrl = '/api/blogs'
+const baseUrl = 'http://localhost:3001/blogs'
 
 let token = null;
 
@@ -32,4 +32,17 @@ const getUserBlogs = async () =>{
 
 }
 
-export default { getAll, setToken, create, getUserBlogs}
+const deleteBlog = async id =>{
+  const response = await axios.delete(`${baseUrl + '/' + id}`)
+  return response
+}
+
+const updateBlog = async blog =>{
+  const config = {
+    headers: {Authorization: token}
+  }
+  const response = await axios.patch(baseUrl + '/' + blog.id, blog, config)
+  return response
+}
+
+export default { getAll, setToken, create, getUserBlogs, deleteBlog, updateBlog}

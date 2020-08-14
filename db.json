@@ -12,7 +12,7 @@
       "title": "Modern CSS Explained For Dinosaurs",
       "author": "Peter Jang",
       "url": "https://medium.com/actualize-network/modern-css-explained-for-dinosaurs-5226febe3525",
-      "likes": 25000,
+      "likes": "1990000",
       "user": "5f2cb9403bdbab46eccfb383",
       "id": "5f2cb9413bdbab46eccfb385"
     },
@@ -23,6 +23,13 @@
       "likes": 25000,
       "user": "5f2cb9403bdbab46eccfb383",
       "id": "1111"
+    },
+    {
+      "title": "Medium’s CSS is actually pretty f***ing good.",
+      "author": "fat",
+      "likes": "6400",
+      "url": "https://www.google.com/search?client=firefox-b-d&q=medium+css",
+      "id": "ck5uEhV"
     }
   ]
 }

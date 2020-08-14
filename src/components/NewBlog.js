@@ -21,7 +21,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const NewBlog = () => {
+const NewBlog = props => {
+    let {updateBlogs} = props;
     const [submitted, setSubmitted] = React.useState('false')
     const [succes, setSuccess] = React.useState(null)
     const [errorMessage, setErrorMessage] = React.useState('')
@@ -40,6 +41,9 @@ const NewBlog = () => {
             url
         }
         blogServices.create(blog).then(() =>{
+            blogServices.getUserBlogs().then(blogs => updateBlogs(blogs)).catch(err => {
+                console.log("error fetching blogs: ", err)
+            })
             setTimeout(() =>{
                 setSubmitted(false)
                 setSuccess(true)

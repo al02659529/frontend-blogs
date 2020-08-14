@@ -7,7 +7,8 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import NewBlog from './NewBlog'
-
+import './Blogs.css'
+import blogsService from '../services/blogs'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -36,15 +37,16 @@ const useStyles = makeStyles((theme) => ({
         color: "white"
     },
     container:{
-        marginTop: "2rem"
+       margin: "2rem 1rem"
     }
 }));
 
 
 const Blogs = props => {
-    let {user, blogs} = props;
+    let {user, blogs, updateBlogs} = props;
     const classes = useStyles();
     const [page, setPage] = React.useState('all');
+    const [sort, setSort] = React.useState('date')
     const logout = () =>{
         localStorage.clear()
         window.location.reload(true)
@@ -52,6 +54,17 @@ const Blogs = props => {
     const handlePage = (event, newPage) => {
         setPage(newPage);
     };
+    const sortByLikes = () =>{
+        const oldBlogList = [...blogs]
+        const sortedList = oldBlogList.sort((a, b) => parseFloat(b.likes) - parseFloat(a.likes))
+        console.log(sortedList)
+        updateBlogs(sortedList)
+    }
+
+    const sortByDate = async () =>{
+        const databaseBlogs = await blogsService.getUserBlogs()
+        updateBlogs(databaseBlogs)
+    }
 
     return (
 
@@ -79,13 +92,31 @@ const Blogs = props => {
                 </Toolbar>
             </AppBar>
             {page === 'all' ?
-                <Grid className={classes.container} container justify="space-evenly" >
-                    {blogs.map(blog =>
-                        <Blog key={blog.id} blog={blog} />
-                    )}
-                </Grid>
+               <>
+                   <div style={{display: "flex", justifyContent:"flex-end", margin: "1rem"}}>
+                       <div>
+                           <p style={{display: "inline-block", fontSize: "1rem", marginRight: "1rem", color: "grey"}}>Sort by</p>
+                           <ToggleButtonGroup value={sort} exclusive onChange={(e, newSort) => {
+                               setSort(newSort)
+                           }}>
+                               <ToggleButton value="date" onClick={sortByDate}>Date</ToggleButton>
+                               <ToggleButton value="likes" onClick={sortByLikes}>Likes</ToggleButton>
+                           </ToggleButtonGroup>
+                       </div>
+                   </div>
+                <div className="grid-container" >
+                    {sort === "date" ? blogs.map((blog, index) =>
+                        <Blog index={index} key={blog.id} blog={blog} blogs={blogs} updateBlogs={updateBlogs}/>
+                    ) :
+                        blogs.map((blog, index) =>
+                            <Blog key={blog.id} blog={blog} blogs={blogs} updateBlogs={updateBlogs}/>)
+
+                    }
+
+                </div>
+               </>
                 :
-                <NewBlog />
+                <NewBlog updateBlogs={updateBlogs} />
             }
 
         </div>
