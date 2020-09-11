@@ -1,6 +1,6 @@
 import axios from 'axios'
 // const baseUrl = '/api/blogs'
-const baseUrl = 'http://localhost:3001/blogs'
+const baseUrl = 'http://localhost:3003/api/blogs'
 
 let token = null
 
@@ -33,7 +33,10 @@ const getUserBlogs = async () => {
 }
 
 const deleteBlog = async id => {
-  const response = await axios.delete(`${baseUrl + '/' + id}`)
+  const config = {
+    headers: { Authorization: token }
+  }
+  const response = await axios.delete(`${baseUrl + '/' + id}`, config)
   return response
 }
 

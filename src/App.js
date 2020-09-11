@@ -43,7 +43,7 @@ const App = () => {
       })
     }
     catch (exception){
-      setError(exception.response.data.error)
+      setError(exception.response.data)
       setTimeout(() => {
         setError(null)
       }, 4000)
@@ -55,9 +55,9 @@ const App = () => {
     <>
       {user === null
         ?
-        <Login error= {error} username={username} password={password} setUsername={setUsername} setPassword={setPassword} handleLogin={handleFormSubmit}/>
+          <Login error={error} setError={setError} setUser={setUser} setBlogs={setBlogs} error= {error} username={username} password={password} setUsername={setUsername} setPassword={setPassword} handleLogin={handleFormSubmit}/>
         :
-        <Blogs user={user} blogs={blogs} updateBlogs={setBlogs} />
+          <Blogs user={user} blogs={blogs} updateBlogs={setBlogs} />
       }
     </>
 

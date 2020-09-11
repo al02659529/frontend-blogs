@@ -1,0 +1,33 @@
+.input_group {
+  display: flex;
+  text-align: center;
+  font-size: 1rem;
+  align-items: center;
+}
+
+input {
+  margin-left: 2rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 7px;
+  border: 1px solid grey;
+}
+
+label {
+  min-width: 4rem;
+}
+
+.alertWrapper {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.form {
+  margin: 4rem;
+}
+
+.nav {
+  margin: 1.5rem 3rem;
+}
+
+/*# sourceMappingURL=Register.css.map */

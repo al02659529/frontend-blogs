@@ -11,120 +11,135 @@ import blogsService from '../services/blogs'
 import PropTypes from 'prop-types'
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
-  username: {
-    flexGrow: 4,
-  },
-  maincolor:{
-    backgroundColor: '#B03972'
-  },
-  newLink: {
-    flexGrow: 2
-  },
-  allBlogs: {
-    flexGrow: 2
-  },
-  title:{
-    fontSize: '2.3rem'
-  },
-  toggleButton:{
-    border: 'none',
-    color: 'white'
-  },
-  container:{
-    margin: '2rem 1rem'
-  }
+    root: {
+        flexGrow: 1,
+    },
+    menuButton: {
+        marginRight: theme.spacing(2),
+    },
+    username: {
+        flexGrow: 4,
+    },
+    maincolor:{
+        backgroundColor: '#B03972'
+    },
+    newLink: {
+        flexGrow: 2
+    },
+    allBlogs: {
+        flexGrow: 2
+    },
+    title:{
+        fontSize: '2.3rem'
+    },
+    toggleButton:{
+        border: 'none',
+        color: 'white'
+    },
+    container:{
+        margin: '2rem 1rem'
+    }
 }))
+
+const NoBlogs = props =>{
+    let {setPage } = props;
+
+    const handleClick = () =>{
+        setPage('new')
+    }
+
+    return (
+        <div style={{display: 'flex', justifyContent: 'center' }}>
+            <h2 style={{color: '#3f51b5'}}>No blogs yet, try <button className="newPage" onClick={handleClick} style={{padding: '.5rem 2rem', borderRadius: '5px', border: '1px solid grey', cursor: 'pointer'}}>Adding a new blog</button></h2>
+        </div>
+    )
+}
 
 
 const Blogs = props => {
-  let { user, blogs, updateBlogs } = props
-  const classes = useStyles()
-  const [page, setPage] = React.useState('all')
-  const [sort, setSort] = React.useState('date')
-  const logout = () => {
-    localStorage.clear()
-    window.location.reload(true)
-  }
-  const handlePage = (event, newPage) => {
-    setPage(newPage)
-  }
-  const sortByLikes = () => {
-    const oldBlogList = [...blogs]
-    const sortedList = oldBlogList.sort((a, b) => parseFloat(b.likes) - parseFloat(a.likes))
-    updateBlogs(sortedList)
-  }
+    let { user, blogs, updateBlogs } = props
+    const classes = useStyles()
+    const [page, setPage] = React.useState('all')
+    const [sort, setSort] = React.useState('date')
+    const logout = () => {
+        localStorage.clear()
+        window.location.reload(true)
+    }
+    const handlePage = (event, newPage) => {
+        setPage(newPage)
+    }
+    const sortByLikes = () => {
+        const oldBlogList = [...blogs]
+        const sortedList = oldBlogList.sort((a, b) => parseFloat(b.likes) - parseFloat(a.likes))
+        updateBlogs(sortedList)
+    }
 
-  const sortByDate = async () => {
-    const databaseBlogs = await blogsService.getUserBlogs()
-    updateBlogs(databaseBlogs)
-  }
+    const sortByDate = async () => {
+        const databaseBlogs = await blogsService.getUserBlogs()
+        updateBlogs(databaseBlogs)
+    }
 
-  return (
+    return (
 
-    <div>
-      <AppBar position="static">
-        <Toolbar className={classes.maincolor}>
-          <Typography variant="h6" edge="start" className={classes.username}>
-            {user.name}
-          </Typography>
-          <ToggleButtonGroup
-            value={page}
-            exclusive
-            onChange={handlePage}
-            size="medium"
-          >
-            <ToggleButton className={classes.toggleButton} value="all" >
-              <div className={classes.allBlogs} color="inherit">All your blogs</div>
-            </ToggleButton>
-            <ToggleButton className={classes.toggleButton} value="new" >
-              <div className={classes.newLink} color="inherit">Add new link</div>
-            </ToggleButton>
-          </ToggleButtonGroup>
-          <Button onClick={logout} color="inherit">Logout</Button>
+        <div>
+            <AppBar position="static">
+                <Toolbar className={classes.maincolor}>
+                    <Typography variant="h6" edge="start" className={classes.username}>
+                        {user.name}
+                    </Typography>
+                    <ToggleButtonGroup
+                        value={page}
+                        exclusive
+                        onChange={handlePage}
+                        size="medium"
+                    >
+                        <ToggleButton className={classes.toggleButton} value="all" >
+                            <div className={classes.allBlogs} color="inherit">All your blogs</div>
+                        </ToggleButton>
+                        <ToggleButton className={classes.toggleButton} value="new" >
+                            <div className={classes.newLink} color="inherit">Add new link</div>
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                    <Button onClick={logout} color="inherit">Logout</Button>
+                </Toolbar>
+            </AppBar>
+            {page === 'all' ?
+                <>
+                    <div style={{ display: 'flex', justifyContent:'flex-end', margin: '1rem' }}>
+                        <div>
+                            <p style={{ display: 'inline-block', fontSize: '1rem', marginRight: '1rem', color: 'grey' }}>Sort by</p>
+                            <ToggleButtonGroup value={sort} exclusive onChange={(e, newSort) => {
+                                setSort(newSort)
+                            }}>
+                                <ToggleButton value="date" onClick={sortByDate}>Date</ToggleButton>
+                                <ToggleButton value="likes" onClick={sortByLikes}>Likes</ToggleButton>
+                            </ToggleButtonGroup>
+                        </div>
+                    </div>
+                    {blogs.length < 1 ? <NoBlogs setPage={setPage} />
+                        :
+                        <div className="grid-container" >
+                            {sort === 'date' ? blogs.map((blog, index) =>
+                                <Blog key={blog.id} index={index} blog={blog} blogs={blogs} updateBlogs={updateBlogs}/>
+                            ) :
+                                blogs.map((blog, index) =>
+                                    <Blog key={blog.id} index={index} blog={blog} blogs={blogs} updateBlogs={updateBlogs}/>)
+                            }
+                        </div>
+                    }
 
-        </Toolbar>
-      </AppBar>
-      {page === 'all' ?
-        <>
-          <div style={{ display: 'flex', justifyContent:'flex-end', margin: '1rem' }}>
-            <div>
-              <p style={{ display: 'inline-block', fontSize: '1rem', marginRight: '1rem', color: 'grey' }}>Sort by</p>
-              <ToggleButtonGroup value={sort} exclusive onChange={(e, newSort) => {
-                setSort(newSort)
-              }}>
-                <ToggleButton value="date" onClick={sortByDate}>Date</ToggleButton>
-                <ToggleButton value="likes" onClick={sortByLikes}>Likes</ToggleButton>
-              </ToggleButtonGroup>
-            </div>
-          </div>
-          <div className="grid-container" >
-            {sort === 'date' ? blogs.map((blog, index) =>
-              <Blog key={blog.id} index={index} blog={blog} blogs={blogs} updateBlogs={updateBlogs}/>
-            ) :
-              blogs.map((blog, index) =>
-                <Blog key={blog.id} index={index} blog={blog} blogs={blogs} updateBlogs={updateBlogs}/>)
-
+                </>
+                :
+                <NewBlog updateBlogs={updateBlogs} />
             }
 
-          </div>
-        </>
-        :
-        <NewBlog updateBlogs={updateBlogs} />
-      }
-
-    </div>
-  )
+        </div>
+    )
 }
 
 Blogs.propTypes ={
-  user: PropTypes.object.isRequired,
-  blogs: PropTypes.array.isRequired,
-  updateBlogs: PropTypes.func.isRequired
+    user: PropTypes.object.isRequired,
+    blogs: PropTypes.array.isRequired,
+    updateBlogs: PropTypes.func.isRequired
 }
 export default Blogs
