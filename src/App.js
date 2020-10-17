@@ -1,63 +1,43 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import blogService from './services/blogs'
-import loginService from './services/login'
 import './main.css'
 import Login from './components/Login'
 import Blogs from './components/Blogs'
+import { useDispatch, useSelector } from 'react-redux'
+import {setUser} from './reducers/userReducer'
+import {setBlogs} from "./reducers/blogsReducer";
+import {setPage} from "./reducers/pageReducer";
+
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
-  const [error, setError] = useState(null)
+  const dispatch = useDispatch()
+  const user = useSelector(state => state.user)
 
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
+
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
-      blogService.getUserBlogs().then(blogs => setBlogs(blogs)).catch(err => {
+      const loggedUser = JSON.parse(loggedUserJSON)
+      dispatch(setUser(loggedUser))
+      blogService.setToken(loggedUser.token)
+      blogService.getUserBlogs().then(blogs => dispatch(setBlogs(blogs))).catch(err => {
         console.log('error fetching blogs: ', err)
       })
-
+    } else {
+      dispatch(setPage('login'))
     }
-  }, [])
+  }, [dispatch])
 
 
-  const handleFormSubmit = async event => {
-    event.preventDefault()
-    try {
-      const user = await loginService.login({ username, password })
-      setUser(user)
-      blogService.setToken(user.token)
-      window.localStorage.setItem(
-        'loggedBlogAppUser', JSON.stringify(user)
-      )
-      setUsername('')
-      setPassword('')
-      blogService.getUserBlogs().then(blogs => setBlogs(blogs)).catch(err => {
-        console.log('error fetching blogs: ', err)
-      })
-    }
-    catch (exception){
-      setError(exception.response.data)
-      setTimeout(() => {
-        setError(null)
-      }, 4000)
-    }
 
-
-  }
   return (
     <>
       {user === null
         ?
-          <Login error={error} setError={setError} setUser={setUser} setBlogs={setBlogs} error= {error} username={username} password={password} setUsername={setUsername} setPassword={setPassword} handleLogin={handleFormSubmit}/>
+          <Login />
         :
-          <Blogs user={user} blogs={blogs} updateBlogs={setBlogs} />
+          <Blogs />
       }
     </>
 

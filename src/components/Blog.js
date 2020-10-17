@@ -10,6 +10,8 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff'
 import blogServices from '../services/blogs'
 import UnfoldLessIcon from '@material-ui/icons/UnfoldLess'
 import PropTypes from 'prop-types'
+import {useDispatch, useSelector} from "react-redux";
+import {setBlogs} from "../reducers/blogsReducer";
 
 
 const useStyles = makeStyles({
@@ -86,17 +88,19 @@ const useStyles = makeStyles({
     }
 })
 
-const Blog = ({ blog , blogs, updateBlogs, index }) => {
-    const classes = useStyles()
+const Blog = ({ blog , index }) => {
     const [toggle, setToggle] = React.useState(false)
-
+    const blogs = useSelector( state => state.blogs)
+    const classes = useStyles()
+    const dispatch = useDispatch()
 
     const deleteBlog = async () => {
         const newBlogs = blogs.filter(item => item.id !== blog.id)
         const response = await blogServices.deleteBlog(blog.id)
-        updateBlogs(newBlogs)
+        dispatch(setBlogs(newBlogs))
         return response
     }
+
     const changeToggle = () => {
         setToggle(!toggle)
     }
@@ -104,22 +108,22 @@ const Blog = ({ blog , blogs, updateBlogs, index }) => {
     const changeLikes = async () => {
         const response = await blogServices.updateBlog(blog)
         const newBlogs = await blogServices.getUserBlogs()
-        updateBlogs(newBlogs)
+        dispatch(setBlogs(newBlogs))
         return response
     }
+
     const handleLikes = e => {
-    // const filteredBlog = blogs.filter(iter => iter.id === blog.id)
         const newBlog = blog
         newBlog.likes = e.target.value
         const newBlogs = [].concat(blogs)
         newBlogs[index] = newBlog
-        updateBlogs(newBlogs)
-
+        dispatch(setBlogs(newBlogs))
     }
+
     return (
         <div className="card">
             <Card className={classes.root} variant="outlined">
-                <CardHeader className={classes.header} titleTypographyProps={{ variant:'subtitle1' }}title={blog.title} subheader={'by ' + blog.author} />
+                <CardHeader className={classes.header} titleTypographyProps={{ variant:'subtitle1' }} title={blog.title} subheader={'by ' + blog.author} />
                 {toggle === false ? <div onClick={changeToggle} className={classes.expandIconContainer}>
                     <ExpandMoreIcon style={{ color: 'inherit' }} />
                 </div> :
@@ -149,8 +153,6 @@ const Blog = ({ blog , blogs, updateBlogs, index }) => {
 
 Blog.propTypes = {
     blog: PropTypes.object.isRequired,
-    blogs: PropTypes.array.isRequired,
-    updateBlogs: PropTypes.func.isRequired,
     index: PropTypes.number.isRequired
 }
 

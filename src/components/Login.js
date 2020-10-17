@@ -1,16 +1,25 @@
 import React from 'react'
 import { Button, TextField , Typography, Container } from '@material-ui/core'
 import MuiAlert from '@material-ui/lab/Alert'
-import PropTypes from 'prop-types'
 import Register from "./Register";
+import {useDispatch, useSelector} from "react-redux";
+import {setUsername} from "../reducers/usernameReducer";
+import {setPassword} from "../reducers/passwordReducer";
+import loginService from "../services/login";
+import {setUser} from "../reducers/userReducer";
+import blogService from "../services/blogs";
+import {setError} from "../reducers/errorReducer";
+import {setBlogs} from "../reducers/blogsReducer";
+import {setPage} from "../reducers/pageReducer";
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />
 }
 
-const RegisterHandler = props => {
+const RegisterHandler = () => {
+    const dispatch = useDispatch()
     const handleClick = () => {
-        props.setPage('register')
+        dispatch(setPage('register'))
     }
     return (
         <div>
@@ -20,9 +29,35 @@ const RegisterHandler = props => {
 }
 
 
-const Login = props => {
-    let { setError, setBlogs, setUser, username, password, setUsername, setPassword, handleLogin, error } = props
-    const [currentPage, setPage] = React.useState('login')
+const Login = () => {
+
+    const dispatch = useDispatch()
+    const username = useSelector( state => state.username )
+    const password = useSelector( state => state.password)
+    const error = useSelector( state => state.error)
+    const currentPage = useSelector( state => state.page)
+
+
+    const handleLogin = async event => {
+        event.preventDefault()
+        try {
+            const user = await loginService.login({ username, password })
+            dispatch(setUser(user))
+            blogService.setToken(user.token)
+            window.localStorage.setItem(
+                'loggedBlogAppUser', JSON.stringify(user)
+            )
+            dispatch(setUsername(''))
+            dispatch(setPassword(''))
+            const userBlogs = await blogService.getUserBlogs()
+            dispatch(setBlogs(userBlogs))
+            dispatch(setPage('all'))
+        }
+        catch (exception){
+            dispatch(setError(exception.response.data))
+        }
+    }
+
 
     return (
         <>
@@ -32,10 +67,10 @@ const Login = props => {
                         <Typography paragraph align="center" variant='h3' color="primary">Bloggie</Typography>
                         <Container>
                             <form id="loginForm" onSubmit={handleLogin}>
-                                <TextField value={username} onChange={({ target }) => setUsername(target.value)} size="small" label="username" variant="outlined" required></TextField>
-                                <TextField value={password} onChange={({ target }) => setPassword(target.value)} size="small" type="password" label="password" variant="outlined" required></TextField>
+                                <TextField value={username} onChange={ ( { target } ) => dispatch(setUsername(target.value)) } size="small" label="username" variant="outlined" required></TextField>
+                                <TextField value={password} onChange={ ( { target } ) => dispatch(setPassword(target.value)) } size="small" type="password" label="password" variant="outlined" required></TextField>
                                 <Button size="small" type="submit" variant="contained" color="primary">Login</Button>
-                                <RegisterHandler setPage={setPage}></RegisterHandler>
+                                <RegisterHandler ></RegisterHandler>
                                 {error !== null  ?
                                     <Alert severity="error">{error}</Alert> : <span></span>
                                 }
@@ -43,19 +78,11 @@ const Login = props => {
                         </Container>
                     </Container>
                 </>
-                : <Register setPage={setPage} setUser={setUser} setBlogs={setBlogs} error={error} setError={setError}/>
+                : currentPage === 'register' ? <Register setPage={setPage} setBlogs={setBlogs}/> : <h1>invalid page</h1>
             }
         </>
     )
 
-}
-
-Login.propTypes = {
-    username: PropTypes.string.isRequired,
-    password: PropTypes.string.isRequired,
-    setUsername: PropTypes.func.isRequired,
-    setPassword: PropTypes.func.isRequired,
-    handleLogin: PropTypes.func.isRequired
 }
 
 export default Login

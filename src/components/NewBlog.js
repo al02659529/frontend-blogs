@@ -1,20 +1,24 @@
-import React from 'react'
+import React from "react";
 import blogServices from '../services/blogs'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import MuiAlert from '@material-ui/lab/Alert'
 import './NewBlog.css'
-import PropTypes from 'prop-types'
+import {setBlogs} from "../reducers/blogsReducer";
+import {useDispatch, useSelector} from "react-redux";
+import {setError} from "../reducers/errorReducer";
+import {setSuccess} from "../reducers/successReducer";
+import {setSubmitted} from "../reducers/submittedReducer";
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />
 }
 
 
-const NewBlog = props => {
-    let { updateBlogs } = props
-    const [submitted, setSubmitted] = React.useState('false')
-    const [succes, setSuccess] = React.useState(null)
-    const [errorMessage, setErrorMessage] = React.useState('')
+const NewBlog = () => {
+    const error = useSelector( state => state.error)
+    const isSubmitted = useSelector( state => state.isSubmitted)
+    const success = useSelector( state => state.success)
+    const dispatch = useDispatch()
 
     const newBlog = async e => {
         e.preventDefault()
@@ -22,34 +26,27 @@ const NewBlog = props => {
         const author = e.target.author.value
         const likes = e.target.likes.value
         const url = e.target.url.value
-        setSubmitted(true)
-        const blog = {
-            title,
-            author,
-            likes,
-            url
-        }
-        blogServices.create(blog).then(() => {
-            blogServices.getUserBlogs().then(blogs => updateBlogs(blogs)).catch(err => {
-                console.log('error fetching blogs: ', err)
-            })
-            setTimeout(() => {
-                setSubmitted(false)
-                setSuccess(true)
-            }, 2000)
-            setTimeout(() => {
-                setSuccess('')
-            }, 5000)
-        }).catch(err => {
-            setSubmitted(false)
-            setSuccess('error')
-            setErrorMessage(err.response.data.error)
-            setTimeout(() => {
-                setSuccess(null)
-                setErrorMessage('')
-            }, 5000)
-        })
+        const blog = { title, author, likes, url }
+        dispatch(setSubmitted(true))
 
+        try {
+            const newBlog = await blogServices.create(blog)
+            const userBlogs = await blogServices.getUserBlogs()
+            dispatch(setBlogs(userBlogs))
+        }
+        catch (exception) {
+            dispatch(setSubmitted(false))
+            dispatch(setSuccess('error'))
+            dispatch(setError(exception.response.data.error))
+        }
+
+        setTimeout(() => {
+            dispatch(setSubmitted(false))
+            dispatch(setSuccess(true))
+        }, 2000)
+        setTimeout(() => {
+            dispatch(setSuccess(null))
+        }, 5000)
     }
     return (
         <form onSubmit={newBlog} >
@@ -70,19 +67,17 @@ const NewBlog = props => {
                 <input className="input_value" type="text" id="url"/>
             </div>
             <button className="btn" type="submit">Submit</button>
-            {submitted === true ?
+            {isSubmitted === true ?
                 <CircularProgress /> : <span></span>
             }
-            {succes === true ?
+            {success === true ?
                 <Alert severity="success">Blog added!</Alert> :
-                succes === 'error' ? <Alert severity="error">{errorMessage}</Alert> : <span></span>
+                success === 'error' ? <Alert severity="error">{error}</Alert> : <span></span>
             }
         </form>
     )
 }
 
-NewBlog.propTypes = {
-    updateBlogs: PropTypes.func.isRequired
-}
+
 
 export default NewBlog

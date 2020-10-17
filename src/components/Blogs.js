@@ -8,7 +8,10 @@ import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup'
 import NewBlog from './NewBlog'
 import './Blogs.css'
 import blogsService from '../services/blogs'
-import PropTypes from 'prop-types'
+import {useDispatch, useSelector} from "react-redux";
+import {setBlogs} from "../reducers/blogsReducer";
+import {setPage} from "../reducers/pageReducer";
+import {setSort} from "../reducers/sortReducer";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -41,11 +44,11 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-const NoBlogs = props =>{
-    let {setPage } = props;
+const NoBlogs = () =>{
+    const dispatch = useDispatch()
 
     const handleClick = () =>{
-        setPage('new')
+        dispatch(setPage('new'))
     }
 
     return (
@@ -56,27 +59,31 @@ const NoBlogs = props =>{
 }
 
 
-const Blogs = props => {
-    let { user, blogs, updateBlogs } = props
+const Blogs = () => {
     const classes = useStyles()
-    const [page, setPage] = React.useState('all')
-    const [sort, setSort] = React.useState('date')
+    const user = useSelector(state => state.user)
+    const blogs = useSelector( state => state.blogs)
+    const page = useSelector( state => state.page)
+    const sort = useSelector( state => state.sortBy)
+    const dispatch = useDispatch()
+
     const logout = () => {
         localStorage.clear()
         window.location.reload(true)
     }
     const handlePage = (event, newPage) => {
-        setPage(newPage)
+        dispatch(setPage(newPage))
     }
     const sortByLikes = () => {
         const oldBlogList = [...blogs]
-        const sortedList = oldBlogList.sort((a, b) => parseFloat(b.likes) - parseFloat(a.likes))
-        updateBlogs(sortedList)
+        const sortedBlogs = oldBlogList.sort((a, b) => parseFloat(b.likes) - parseFloat(a.likes) )
+        dispatch(setBlogs(sortedBlogs))
     }
 
     const sortByDate = async () => {
         const databaseBlogs = await blogsService.getUserBlogs()
-        updateBlogs(databaseBlogs)
+        console.log(databaseBlogs)
+        dispatch(setBlogs(databaseBlogs))
     }
 
     return (
@@ -109,7 +116,7 @@ const Blogs = props => {
                         <div>
                             <p style={{ display: 'inline-block', fontSize: '1rem', marginRight: '1rem', color: 'grey' }}>Sort by</p>
                             <ToggleButtonGroup value={sort} exclusive onChange={(e, newSort) => {
-                                setSort(newSort)
+                                dispatch(setSort(newSort))
                             }}>
                                 <ToggleButton value="date" onClick={sortByDate}>Date</ToggleButton>
                                 <ToggleButton value="likes" onClick={sortByLikes}>Likes</ToggleButton>
@@ -119,27 +126,18 @@ const Blogs = props => {
                     {blogs.length < 1 ? <NoBlogs setPage={setPage} />
                         :
                         <div className="grid-container" >
-                            {sort === 'date' ? blogs.map((blog, index) =>
-                                <Blog key={blog.id} index={index} blog={blog} blogs={blogs} updateBlogs={updateBlogs}/>
-                            ) :
-                                blogs.map((blog, index) =>
-                                    <Blog key={blog.id} index={index} blog={blog} blogs={blogs} updateBlogs={updateBlogs}/>)
-                            }
+                            { blogs.map((blog, index) => <Blog key={blog.id} index={index} blog={blog} />) }
                         </div>
                     }
 
                 </>
                 :
-                <NewBlog updateBlogs={updateBlogs} />
+                <NewBlog />
             }
 
         </div>
     )
 }
 
-Blogs.propTypes ={
-    user: PropTypes.object.isRequired,
-    blogs: PropTypes.array.isRequired,
-    updateBlogs: PropTypes.func.isRequired
-}
+
 export default Blogs

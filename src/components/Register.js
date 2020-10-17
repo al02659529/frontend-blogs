@@ -5,52 +5,54 @@ import service from '../services/register'
 import loginService from '../services/login'
 import blogService from '../services/blogs'
 import MuiAlert from '@material-ui/lab/Alert'
+import {useDispatch, useSelector} from "react-redux";
+import { setUser } from "../reducers/userReducer";
+import { setError } from "../reducers/errorReducer";
+import {setPage} from "../reducers/pageReducer";
+import {setBlogs} from "../reducers/blogsReducer";
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />
 }
 
-const Register = props => {
-    let { setPage, setUser, setBlogs, setError, error } = props
+const Register = () => {
+    const dispatch = useDispatch()
+    const error = useSelector( state => state.error)
 
     const handleSubmit = async e => {
         e.preventDefault()
         const name = e.target.name.value
         const username = e.target.username.value
         const password = e.target.password.value
-
         const newUser = { name, username, password }
-        console.log(newUser)
+
         try{
             const response = await service.registerUser(newUser)
             const user = await loginService.login({ username, password })
-            setUser(user)
+            dispatch(setUser(user))
             blogService.setToken(user.token)
             window.localStorage.setItem(
                 'loggedBlogAppUser', JSON.stringify(user)
             )
-
-            blogService.getUserBlogs().then(blogs => setBlogs(blogs)).catch(err => {
-                console.log('error fetching blogs: ', err)
-            })
+            const blogs = await blogService.getUserBlogs()
+            dispatch(setBlogs(blogs))
+            dispatch(setPage('all'))
         }
         catch (exception){
-            setError(exception.response.data.error)
-            setTimeout(() => {
-                setError(null)
-            }, 6000)
+            dispatch(setError(exception.response.data.error))
         }
     }
+
     const handleGoBackToLoginPage = () => {
-        setPage('login')
+        dispatch(setPage('login'))
     }
+
     return (
         <div>
             <div className="nav">
                 <Button size="small" onClick={handleGoBackToLoginPage} variant="contained" color="secondary">Go back to Login page</Button>
             </div>
             <form onSubmit={handleSubmit}>
-
                 <div className="input_group">
                     <label htmlFor="Password">Name</label>
                     <input placeholder="John Doe" type="text" name="name" id="name"/>
@@ -64,7 +66,6 @@ const Register = props => {
                     <input placeholder="Must be a secure password" type="password" id="password"/>
                 </div>
                 <Button size="small" type="submit" variant="contained" color="primary">Register</Button>
-
             </form>
             {error !== null  ?
                 <div className="alertWrapper">
