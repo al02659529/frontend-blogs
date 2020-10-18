@@ -11,6 +11,8 @@ import { setError } from '../reducers/errorReducer'
 import { setPage } from '../reducers/pageReducer'
 import { setBlogs } from '../reducers/blogsReducer'
 import cookie from 'cookie_js'
+import { useHistory } from 'react-router-dom'
+
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />
@@ -18,8 +20,13 @@ function Alert(props) {
 
 const Register = () => {
     const dispatch = useDispatch()
+    const history = useHistory()
     const error = useSelector( state => state.error)
+    const currentPage = useSelector(state => state.page)
 
+    if (currentPage !== 'register') {
+        dispatch(setPage('register'))
+    }
     const handleSubmit = async e => {
         e.preventDefault()
         const name = e.target.name.value
@@ -44,6 +51,7 @@ const Register = () => {
 
     const handleGoBackToLoginPage = () => {
         dispatch(setPage('login'))
+        history.push('/login')
     }
 
     return (
@@ -69,7 +77,7 @@ const Register = () => {
             {error !== null  ?
                 <div className="alertWrapper">
                     <Alert severity="error">{error}</Alert>
-                </div>: <span></span>
+                </div>: null
             }
         </div>
     )

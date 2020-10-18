@@ -1,6 +1,6 @@
 import React from 'react'
 import Blog from './Blog'
-import { Toolbar, Button , Typography } from '@material-ui/core'
+import { Toolbar, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import ToggleButton from '@material-ui/lab/ToggleButton'
@@ -12,7 +12,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setBlogs } from '../reducers/blogsReducer'
 import { setPage } from '../reducers/pageReducer'
 import { setSort } from '../reducers/sortReducer'
-import cookie from 'cookie_js'
+import { useHistory } from 'react-router-dom'
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -67,13 +68,11 @@ const Blogs = () => {
     const page = useSelector( state => state.page)
     const sort = useSelector( state => state.sortBy)
     const dispatch = useDispatch()
+    const history = useHistory()
 
-    const logout = () => {
-        cookie.remove('loggedBlogAppUser')
-        window.location.reload(true)
-    }
     const handlePage = (event, newPage) => {
         dispatch(setPage(newPage))
+        newPage === 'new' ? history.push(`/blogs/${newPage}`) : newPage === 'logout' ? history.push('/logout') : history.push('/blogs')
     }
     const sortByLikes = () => {
         const oldBlogList = [...blogs]
@@ -106,8 +105,10 @@ const Blogs = () => {
                         <ToggleButton className={classes.toggleButton} value="new" >
                             <div className={classes.newLink} color="inherit">Add new link</div>
                         </ToggleButton>
+                        <ToggleButton className={classes.toggleButton} value="logout" >
+                            <div className={classes.newLink} color="inherit">Logout</div>
+                        </ToggleButton>
                     </ToggleButtonGroup>
-                    <Button onClick={logout} color="inherit">Logout</Button>
                 </Toolbar>
             </AppBar>
             {page === 'all' ?
@@ -131,8 +132,7 @@ const Blogs = () => {
                     }
 
                 </>
-                :
-                <NewBlog />
+                : <NewBlog />
             }
 
         </div>

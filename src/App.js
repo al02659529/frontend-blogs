@@ -8,15 +8,22 @@ import { setUser } from './reducers/userReducer'
 import { setBlogs } from './reducers/blogsReducer'
 import { setPage } from './reducers/pageReducer'
 import cookie from 'cookie_js'
+import {
+    Switch,
+    Route,
+    Redirect
+} from 'react-router-dom'
+import Logout from './components/Logout'
+import Register from './components/Register'
+
 
 const App = () => {
     const dispatch = useDispatch()
     const user = useSelector(state => state.user)
 
-
     useEffect(() => {
         const loggedUserJSON = cookie.get('loggedBlogAppUser')
-
+        console.log('Cookie state: ', loggedUserJSON)
         if (loggedUserJSON) {
             const loggedUser = JSON.parse(loggedUserJSON)
             dispatch(setUser(loggedUser))
@@ -33,12 +40,23 @@ const App = () => {
 
     return (
         <>
-            {user === null
-                ?
-                <Login />
-                :
-                <Blogs />
-            }
+            <Switch>
+                <Route path="/logout">
+                    <Logout/>
+                </Route>
+                <Route path="/register">
+                    {user ? <Redirect to="/blogs"/>: <Register/>}
+                </Route>
+                <Route path="/login">
+                    {user ? <Redirect to="/blogs"/> : <Login/>}
+                </Route>
+                <Route path="/blogs">
+                    {user ? <Blogs /> : <Redirect to="/" />}
+                </Route>
+                <Route path="/">
+                    {user === null ? <Redirect to="/login"/> : <Redirect to="/blogs"/>}
+                </Route>
+            </Switch>
         </>
 
     )

@@ -68,12 +68,15 @@ const NewBlog = () => {
                 <input className="input_value" type="text" id="url"/>
             </div>
             <button className="btn" type="submit">Submit</button>
-            {isSubmitted === true ?
-                <CircularProgress /> : <span></span>
+            {isSubmitted === true
+                ? <CircularProgress />
+                : null
             }
-            {success === true ?
-                <Alert severity="success">Blog added!</Alert> :
-                success === 'error' ? <Alert severity="error">{error}</Alert> : <span></span>
+            {success === true
+                ? <Alert severity="success">Blog added!</Alert>
+                : success === 'error'
+                    ? <Alert severity="error">{error}</Alert>
+                    : null
             }
         </form>
     )

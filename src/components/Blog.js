@@ -11,7 +11,7 @@ import blogServices from '../services/blogs'
 import UnfoldLessIcon from '@material-ui/icons/UnfoldLess'
 import { useDispatch, useSelector } from 'react-redux'
 import { setBlogs } from '../reducers/blogsReducer'
-import { toggleIdOfComponentToHideOrShowLikes} from '../reducers/showLikesReducer'
+import { toggleIdOfComponentToHideOrShowLikes } from '../reducers/showLikesReducer'
 
 
 const useStyles = makeStyles({
