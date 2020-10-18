@@ -1,16 +1,17 @@
 import React from 'react'
 import { Button, TextField , Typography, Container } from '@material-ui/core'
 import MuiAlert from '@material-ui/lab/Alert'
-import Register from "./Register";
-import {useDispatch, useSelector} from "react-redux";
-import {setUsername} from "../reducers/usernameReducer";
-import {setPassword} from "../reducers/passwordReducer";
-import loginService from "../services/login";
-import {setUser} from "../reducers/userReducer";
-import blogService from "../services/blogs";
-import {setError} from "../reducers/errorReducer";
-import {setBlogs} from "../reducers/blogsReducer";
-import {setPage} from "../reducers/pageReducer";
+import Register from './Register'
+import { useDispatch, useSelector } from 'react-redux'
+import { setUsername } from '../reducers/usernameReducer'
+import { setPassword } from '../reducers/passwordReducer'
+import loginService from '../services/login'
+import { setUser } from '../reducers/userReducer'
+import blogService from '../services/blogs'
+import { setError } from '../reducers/errorReducer'
+import { setBlogs } from '../reducers/blogsReducer'
+import { setPage } from '../reducers/pageReducer'
+import cookie from 'cookie_js'
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />
@@ -44,9 +45,7 @@ const Login = () => {
             const user = await loginService.login({ username, password })
             dispatch(setUser(user))
             blogService.setToken(user.token)
-            window.localStorage.setItem(
-                'loggedBlogAppUser', JSON.stringify(user)
-            )
+            cookie.set('loggedBlogAppUser', JSON.stringify(user), { expires: 7 })
             dispatch(setUsername(''))
             dispatch(setPassword(''))
             const userBlogs = await blogService.getUserBlogs()

@@ -9,9 +9,9 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import HighlightOffIcon from '@material-ui/icons/HighlightOff'
 import blogServices from '../services/blogs'
 import UnfoldLessIcon from '@material-ui/icons/UnfoldLess'
-import PropTypes from 'prop-types'
-import {useDispatch, useSelector} from "react-redux";
-import {setBlogs} from "../reducers/blogsReducer";
+import { useDispatch, useSelector } from 'react-redux'
+import { setBlogs } from '../reducers/blogsReducer'
+import { toggleIdOfComponentToHideOrShowLikes} from '../reducers/showLikesReducer'
 
 
 const useStyles = makeStyles({
@@ -89,7 +89,7 @@ const useStyles = makeStyles({
 })
 
 const Blog = ({ blog , index }) => {
-    const [toggle, setToggle] = React.useState(false)
+    const isIdInState = useSelector( state => state.showLikes.filter(id => id === blog.id).length > 0)
     const blogs = useSelector( state => state.blogs)
     const classes = useStyles()
     const dispatch = useDispatch()
@@ -101,8 +101,9 @@ const Blog = ({ blog , index }) => {
         return response
     }
 
-    const changeToggle = () => {
-        setToggle(!toggle)
+    const toggleShowLikes = () => {
+        console.log(blog.id)
+        dispatch(toggleIdOfComponentToHideOrShowLikes(blog.id))
     }
 
     const changeLikes = async () => {
@@ -124,18 +125,21 @@ const Blog = ({ blog , index }) => {
         <div className="card">
             <Card className={classes.root} variant="outlined">
                 <CardHeader className={classes.header} titleTypographyProps={{ variant:'subtitle1' }} title={blog.title} subheader={'by ' + blog.author} />
-                {toggle === false ? <div onClick={changeToggle} className={classes.expandIconContainer}>
-                    <ExpandMoreIcon style={{ color: 'inherit' }} />
-                </div> :
-                    <div onClick={changeToggle} className={classes.expandIconContainer}>
+                {isIdInState === false
+                    ? <div onClick={toggleShowLikes} className={classes.expandIconContainer}>
+                        <ExpandMoreIcon style={{ color: 'inherit' }} />
+                    </div>
+                    :
+                    <div onClick={toggleShowLikes} className={classes.expandIconContainer}>
                         <UnfoldLessIcon style={{ color: 'inherit' }} />
                     </div>
                 }
                 <div onClick={deleteBlog} className={classes.deleteIconContainer}>
                     <HighlightOffIcon style={{ color: 'inherit' }}/>
                 </div>
-                {toggle === false ? <span></span> :
-                    <div className='toggableContent'>
+                {isIdInState === false
+                    ? <span></span>
+                    : <div className='toggableContent'>
                         <p style={{ textAlign: 'center', fontSize: '1rem' }}>Likes: <input value={blog.likes} onChange={handleLikes} type="text"/><button onClick={changeLikes}>change</button></p>
                     </div>
                 }
@@ -149,11 +153,6 @@ const Blog = ({ blog , index }) => {
             </Card>
         </div>
     )
-}
-
-Blog.propTypes = {
-    blog: PropTypes.object.isRequired,
-    index: PropTypes.number.isRequired
 }
 
 export default Blog

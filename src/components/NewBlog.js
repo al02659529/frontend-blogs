@@ -1,13 +1,13 @@
-import React from "react";
+import React from 'react'
 import blogServices from '../services/blogs'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import MuiAlert from '@material-ui/lab/Alert'
 import './NewBlog.css'
-import {setBlogs} from "../reducers/blogsReducer";
-import {useDispatch, useSelector} from "react-redux";
-import {setError} from "../reducers/errorReducer";
-import {setSuccess} from "../reducers/successReducer";
-import {setSubmitted} from "../reducers/submittedReducer";
+import { setBlogs } from '../reducers/blogsReducer'
+import { useDispatch, useSelector } from 'react-redux'
+import { setError } from '../reducers/errorReducer'
+import { setSuccess } from '../reducers/successReducer'
+import { setSubmitted } from '../reducers/submittedReducer'
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />
@@ -48,8 +48,9 @@ const NewBlog = () => {
             dispatch(setSuccess(null))
         }, 5000)
     }
+
     return (
-        <form onSubmit={newBlog} >
+        <form onSubmit={newBlog}>
             <div className="input">
                 <label className="input_title" htmlFor="title" ><span><p>Title</p></span></label>
                 <input className="input_value" type="text" id="title"/>

@@ -5,11 +5,12 @@ import service from '../services/register'
 import loginService from '../services/login'
 import blogService from '../services/blogs'
 import MuiAlert from '@material-ui/lab/Alert'
-import {useDispatch, useSelector} from "react-redux";
-import { setUser } from "../reducers/userReducer";
-import { setError } from "../reducers/errorReducer";
-import {setPage} from "../reducers/pageReducer";
-import {setBlogs} from "../reducers/blogsReducer";
+import { useDispatch, useSelector } from 'react-redux'
+import { setUser } from '../reducers/userReducer'
+import { setError } from '../reducers/errorReducer'
+import { setPage } from '../reducers/pageReducer'
+import { setBlogs } from '../reducers/blogsReducer'
+import cookie from 'cookie_js'
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />
@@ -27,13 +28,11 @@ const Register = () => {
         const newUser = { name, username, password }
 
         try{
-            const response = await service.registerUser(newUser)
+            const registeredUser = await service.registerUser(newUser)
             const user = await loginService.login({ username, password })
             dispatch(setUser(user))
             blogService.setToken(user.token)
-            window.localStorage.setItem(
-                'loggedBlogAppUser', JSON.stringify(user)
-            )
+            cookie.set('loggedBlogAppUser', JSON.stringify(user), { expires: 7 })
             const blogs = await blogService.getUserBlogs()
             dispatch(setBlogs(blogs))
             dispatch(setPage('all'))

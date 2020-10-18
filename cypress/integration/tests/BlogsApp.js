@@ -12,7 +12,7 @@ describe('Blog app primary functions', function() {
         cy.get('input:last').type('Sekret123!')
         cy.get('button').should('have.text', 'Login').click()
         cy.contains('Admin')
-    });
+    })
 
     it('should return error logging with an non-existing username', function () {
         cy.get('input:first').type('KEKKIIIISZ9Z99191JJJ')

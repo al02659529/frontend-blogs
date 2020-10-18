@@ -8,10 +8,11 @@ import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup'
 import NewBlog from './NewBlog'
 import './Blogs.css'
 import blogsService from '../services/blogs'
-import {useDispatch, useSelector} from "react-redux";
-import {setBlogs} from "../reducers/blogsReducer";
-import {setPage} from "../reducers/pageReducer";
-import {setSort} from "../reducers/sortReducer";
+import { useDispatch, useSelector } from 'react-redux'
+import { setBlogs } from '../reducers/blogsReducer'
+import { setPage } from '../reducers/pageReducer'
+import { setSort } from '../reducers/sortReducer'
+import cookie from 'cookie_js'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -44,16 +45,16 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-const NoBlogs = () =>{
+const NoBlogs = () => {
     const dispatch = useDispatch()
 
-    const handleClick = () =>{
+    const handleClick = () => {
         dispatch(setPage('new'))
     }
 
     return (
-        <div style={{display: 'flex', justifyContent: 'center' }}>
-            <h2 style={{color: '#3f51b5'}}>No blogs yet, try <button className="newPage" onClick={handleClick} style={{padding: '.5rem 2rem', borderRadius: '5px', border: '1px solid grey', cursor: 'pointer'}}>Adding a new blog</button></h2>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <h2 style={{ color: '#3f51b5' }}>No blogs yet, try <button className="newPage" onClick={handleClick} style={{ padding: '.5rem 2rem', borderRadius: '5px', border: '1px solid grey', cursor: 'pointer' }}>Adding a new blog</button></h2>
         </div>
     )
 }
@@ -68,7 +69,7 @@ const Blogs = () => {
     const dispatch = useDispatch()
 
     const logout = () => {
-        localStorage.clear()
+        cookie.remove('loggedBlogAppUser')
         window.location.reload(true)
     }
     const handlePage = (event, newPage) => {
@@ -82,7 +83,6 @@ const Blogs = () => {
 
     const sortByDate = async () => {
         const databaseBlogs = await blogsService.getUserBlogs()
-        console.log(databaseBlogs)
         dispatch(setBlogs(databaseBlogs))
     }
 

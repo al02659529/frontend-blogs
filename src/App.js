@@ -4,44 +4,44 @@ import './main.css'
 import Login from './components/Login'
 import Blogs from './components/Blogs'
 import { useDispatch, useSelector } from 'react-redux'
-import {setUser} from './reducers/userReducer'
-import {setBlogs} from "./reducers/blogsReducer";
-import {setPage} from "./reducers/pageReducer";
-
+import { setUser } from './reducers/userReducer'
+import { setBlogs } from './reducers/blogsReducer'
+import { setPage } from './reducers/pageReducer'
+import cookie from 'cookie_js'
 
 const App = () => {
-  const dispatch = useDispatch()
-  const user = useSelector(state => state.user)
+    const dispatch = useDispatch()
+    const user = useSelector(state => state.user)
 
 
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
+    useEffect(() => {
+        const loggedUserJSON = cookie.get('loggedBlogAppUser')
 
-    if (loggedUserJSON) {
-      const loggedUser = JSON.parse(loggedUserJSON)
-      dispatch(setUser(loggedUser))
-      blogService.setToken(loggedUser.token)
-      blogService.getUserBlogs().then(blogs => dispatch(setBlogs(blogs))).catch(err => {
-        console.log('error fetching blogs: ', err)
-      })
-    } else {
-      dispatch(setPage('login'))
-    }
-  }, [dispatch])
+        if (loggedUserJSON) {
+            const loggedUser = JSON.parse(loggedUserJSON)
+            dispatch(setUser(loggedUser))
+            blogService.setToken(loggedUser.token)
+            blogService.getUserBlogs().then(blogs => dispatch(setBlogs(blogs))).catch(err => {
+                console.log('error fetching blogs: ', err)
+            })
+        } else {
+            dispatch(setPage('login'))
+        }
+    }, [dispatch])
 
 
 
-  return (
-    <>
-      {user === null
-        ?
-          <Login />
-        :
-          <Blogs />
-      }
-    </>
+    return (
+        <>
+            {user === null
+                ?
+                <Login />
+                :
+                <Blogs />
+            }
+        </>
 
-  )
+    )
 }
 
 export default App
