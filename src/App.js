@@ -23,7 +23,6 @@ const App = () => {
 
     useEffect(() => {
         const loggedUserJSON = cookie.get('loggedBlogAppUser')
-        console.log('Cookie state: ', loggedUserJSON)
         if (loggedUserJSON) {
             const loggedUser = JSON.parse(loggedUserJSON)
             dispatch(setUser(loggedUser))
