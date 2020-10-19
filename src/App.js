@@ -25,6 +25,7 @@ const App = () => {
         const loggedUserJSON = cookie.get('loggedBlogAppUser')
         if (loggedUserJSON) {
             const loggedUser = JSON.parse(loggedUserJSON)
+            console.log(loggedUserJSON)
             dispatch(setUser(loggedUser))
             blogService.setToken(loggedUser.token)
             blogService.getUserBlogs().then(blogs => dispatch(setBlogs(blogs))).catch(err => {
@@ -44,7 +45,7 @@ const App = () => {
                     <Logout/>
                 </Route>
                 <Route path="/register">
-                    {user ? <Redirect to="/blogs"/>: <Register/>}
+                    {user ? <Redirect to="/blogs"/> : <Register/>}
                 </Route>
                 <Route path="/login">
                     {user ? <Redirect to="/blogs"/> : <Login/>}
@@ -57,7 +58,6 @@ const App = () => {
                 </Route>
             </Switch>
         </>
-
     )
 }
 

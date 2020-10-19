@@ -33,7 +33,7 @@ const Login = () => {
             const user = await loginService.login({ username, password })
             dispatch(setUser(user))
             blogService.setToken(user.token)
-            cookie.set('loggedBlogAppUser', JSON.stringify(user), { expires: 7 })
+            cookie.set('loggedBlogAppUser', JSON.stringify(user), { expires: 7, path: '/' })
             dispatch(setUsername(''))
             dispatch(setPassword(''))
             const userBlogs = await blogService.getUserBlogs()

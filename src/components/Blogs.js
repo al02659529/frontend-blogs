@@ -86,7 +86,6 @@ const Blogs = () => {
     }
 
     return (
-
         <div>
             <AppBar position="static">
                 <Toolbar className={classes.maincolor}>
@@ -130,11 +129,9 @@ const Blogs = () => {
                             { blogs.map((blog, index) => <Blog key={blog.id} index={index} blog={blog} />) }
                         </div>
                     }
-
                 </>
                 : <NewBlog />
             }
-
         </div>
     )
 }
